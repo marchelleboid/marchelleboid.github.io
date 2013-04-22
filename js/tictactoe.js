@@ -100,6 +100,7 @@ function countFilledSquares()
 
 // Use minimax to determine the next computer move. Return number of square
 // that computer has decided to make a move on.
+// Returns an array of [best move (square id), best move].
 function getNextMove(myMove)
 {
     var bestMove = -1;
@@ -118,6 +119,7 @@ function getNextMove(myMove)
         }
 
         if (myMove) {
+            // myMove is from the perspective of the computer.
             square.className += " oSquare";
         } else {
             square.className += " xSquare";
@@ -126,16 +128,23 @@ function getNextMove(myMove)
         var score = 0;
         var endGame = checkEndgame();
         if (endGame == 1) {
+            // Player wins, negative score for computer.
             score = -1; 
         } else if (endGame == 2) {
+            // Computer wins, positive score for computer.
             score = 1;
         } else if (endGame == 3) {
+            // Tie game, neutral score for computer.
             score = 0;
         } else {
+            // Recursively call the algorithm, flipping the player,
+            // until we get an end game.
             move = getNextMove(!myMove);
             score = move[1];
         }
 
+        // Revert that move since we don't actually execute the move
+        // until after this method returns.
         square.className = "square";
 
         if (myMove) {
