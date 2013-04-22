@@ -3,6 +3,10 @@ window.onload = function() {
 }
 
 
+// Create a new div for each square on the tic-tac-toe board.
+// Squares are numbered: 0-1-2
+//                       3-4-5
+//                       6-7-8
 function buildBoard()
 {
     var board = document.getElementById("board");
@@ -16,6 +20,9 @@ function buildBoard()
 }
 
 
+// Handler for clicking a square. After every valid click, check for 
+// end game, and then execute a computer move if game is still in
+// progress.
 function clickSquare()
 {
     var board = document.getElementById("board");
@@ -42,6 +49,7 @@ function clickSquare()
 }
 
 
+// Execute the computer's next move.
 function computerMove()
 {
     // If this is the first computer move, pick middle (or corner square if
@@ -56,6 +64,8 @@ function computerMove()
         var textNode = document.createTextNode("O");
         square.appendChild(textNode);
         square.className += " oSquare";
+
+        // No need to check for end game since that is impossible.
     } else {
         var move = getNextMove(true);
 
@@ -71,6 +81,8 @@ function computerMove()
     }
 }
 
+
+// Count the number of squares that have an X or O.
 function countFilledSquares()
 {
     var count = 0;
@@ -86,6 +98,8 @@ function countFilledSquares()
 }
 
 
+// Use minimax to determine the next computer move. Return number of square
+// that computer has decided to make a move on.
 function getNextMove(myMove)
 {
     var bestMove = -1;
@@ -141,6 +155,11 @@ function getNextMove(myMove)
 }
 
 
+// Checks if the game is over.
+// Returns 0 if not over.
+//         1 if player won.
+//         2 if computer won.
+//         3 if tie game.
 function checkEndgame()
 {
     var square0 = document.getElementById("0");
@@ -270,6 +289,7 @@ function checkEndgame()
 }
 
 
+// Adds some endgame text and colors the winning/losing row/column/diagonal.
 function finishGame(result)
 {
     if (result == 0) {
@@ -429,6 +449,7 @@ function finishGame(result)
 }
 
 
+// Helper function to check if an element has a class named 'cls.'
 function hasClass(element, cls) {
     return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }
