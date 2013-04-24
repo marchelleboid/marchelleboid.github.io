@@ -171,119 +171,23 @@ function getNextMove(myMove)
 //         3 if tie game.
 function checkEndgame()
 {
-    var square0 = document.getElementById("0");
-    var square1 = document.getElementById("1");
-    var square2 = document.getElementById("2");
-    var square3 = document.getElementById("3");
-    var square4 = document.getElementById("4");
-    var square5 = document.getElementById("5");
-    var square6 = document.getElementById("6");
-    var square7 = document.getElementById("7");
-    var square8 = document.getElementById("8");
-
     var victory = false;
+    var squares = getWinningSquares("xSquare");
+    if (squares[0] >= 0) {
+        victory = true;
+    }
+
     var loss = false;
-    // row 1
-    if (hasClass(square0, "xSquare") &&
-        hasClass(square1, "xSquare") &&
-        hasClass(square2, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square0, "oSquare") &&
-               hasClass(square1, "oSquare") &&
-               hasClass(square2, "oSquare")) {
-        loss = true;
-    }
-
-    // row 2
-    if (hasClass(square3, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square5, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square3, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square5, "oSquare")) {
-        loss = true;
-    }
-
-    // row 3
-    if (hasClass(square6, "xSquare") &&
-        hasClass(square7, "xSquare") &&
-        hasClass(square8, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square6, "oSquare") &&
-               hasClass(square7, "oSquare") &&
-               hasClass(square8, "oSquare")) {
-        loss = true;
-    }
-
-    // column 1
-    if (hasClass(square0, "xSquare") &&
-        hasClass(square3, "xSquare") &&
-        hasClass(square6, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square0, "oSquare") &&
-               hasClass(square3, "oSquare") &&
-               hasClass(square6, "oSquare")) {
-        loss = true;
-    }
-
-    // column 2
-    if (hasClass(square1, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square7, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square1, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square7, "oSquare")) {
-        loss = true;
-    }
-
-    // column 3
-    if (hasClass(square2, "xSquare") &&
-        hasClass(square5, "xSquare") &&
-        hasClass(square8, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square2, "oSquare") &&
-               hasClass(square5, "oSquare") &&
-               hasClass(square8, "oSquare")) {
-        loss = true;
-    }
-
-    // diagonal left to right
-    if (hasClass(square0, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square8, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square0, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square8, "oSquare")) {
-        loss = true;
-    }
-
-    // diagonal right to left
-    if (hasClass(square2, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square6, "xSquare")) {
-        victory = true;
-    } else if (hasClass(square2, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square6, "oSquare")) {
-        loss = true;
+    if (!victory) {
+        squares = getWinningSquares("oSquare");
+        if (squares[0] >= 0) {
+            loss = true;
+        }
     }
 
     var draw = false;
-    if (!victory && !loss) {
-        if ((hasClass(square0, "xSquare") || hasClass(square0, "oSquare")) &&
-            (hasClass(square1, "xSquare") || hasClass(square1, "oSquare")) &&
-            (hasClass(square2, "xSquare") || hasClass(square2, "oSquare")) &&
-            (hasClass(square3, "xSquare") || hasClass(square3, "oSquare")) &&
-            (hasClass(square4, "xSquare") || hasClass(square4, "oSquare")) &&
-            (hasClass(square5, "xSquare") || hasClass(square5, "oSquare")) &&
-            (hasClass(square6, "xSquare") || hasClass(square6, "oSquare")) &&
-            (hasClass(square7, "xSquare") || hasClass(square7, "oSquare")) &&
-            (hasClass(square8, "xSquare") || hasClass(square8, "oSquare"))) {
-            draw = true;
-        }
+    if (!victory && !loss && (countFilledSquares() == 9)) {
+        draw = true;
     }
 
     if (victory) {
@@ -295,6 +199,32 @@ function checkEndgame()
     } else {
         return 0;
     }
+}
+
+
+// Checks if player or computer has won by checking for presence of 'cls'
+// className in three adjacent squares. Returns three winning squares
+// if a win has been recorded, or [-1, -1, -1] otherwise.
+// Return an array of [square1, square2, square3]
+function getWinningSquares(cls)
+{
+    var winningCombos = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
+                         [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                         [0, 4, 8], [2, 4, 6]];
+
+    for (var i = 0; i < winningCombos.length; i++) {
+        var square0 = document.getElementById(winningCombos[i][0]);
+        var square1 = document.getElementById(winningCombos[i][1]);
+        var square2 = document.getElementById(winningCombos[i][2]);
+
+        if (hasClass(square0, cls) &&
+            hasClass(square1, cls) &&
+            hasClass(square2, cls)) {
+            return winningCombos[i];
+        } 
+    }
+
+    return [-1, -1, -1];
 }
 
 
@@ -314,146 +244,28 @@ function finishGame(result)
         endGameText.appendChild(textNode);
         board.appendChild(endGameText);
         board.className += " gameOver";
+
+        var squares = getWinningSquares("xSquare");
+
+        for (var i = 0; i < squares.length; i++) {
+            document.getElementById(squares[i]).className += " winningSquare";
+        }
     } else if (result == 2) {
         var textNode = document.createTextNode("Sorry, you have been defeated!");
         endGameText.appendChild(textNode);
         board.appendChild(endGameText);
         board.className += " gameOver";
+
+        var squares = getWinningSquares("oSquare");
+
+        for (var i = 0; i < squares.length; i++) {
+            document.getElementById(squares[i]).className += " losingSquare";
+        }
     } else if (result == 3) {
         var textNode = document.createTextNode("Tie game!");
         endGameText.appendChild(textNode);
         board.appendChild(endGameText);
         board.className += " gameOver";
-    }
-
-    var square0 = document.getElementById("0");
-    var square1 = document.getElementById("1");
-    var square2 = document.getElementById("2");
-    var square3 = document.getElementById("3");
-    var square4 = document.getElementById("4");
-    var square5 = document.getElementById("5");
-    var square6 = document.getElementById("6");
-    var square7 = document.getElementById("7");
-    var square8 = document.getElementById("8");
-
-    // row 1
-    if (hasClass(square0, "xSquare") &&
-        hasClass(square1, "xSquare") &&
-        hasClass(square2, "xSquare")) {
-        square0.className += " winningSquare";
-        square1.className += " winningSquare";
-        square2.className += " winningSquare";
-    } else if (hasClass(square0, "oSquare") &&
-               hasClass(square1, "oSquare") &&
-               hasClass(square2, "oSquare")) {
-        square0.className += " losingSquare";
-        square1.className += " losingSquare";
-        square2.className += " losingSquare";
-    }
-
-    // row 2
-    if (hasClass(square3, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square5, "xSquare")) {
-        square3.className += " winningSquare";
-        square4.className += " winningSquare";
-        square5.className += " winningSquare";
-    } else if (hasClass(square3, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square5, "oSquare")) {
-        square3.className += " losingSquare";
-        square4.className += " losingSquare";
-        square5.className += " losingSquare";
-    }
-
-    // row 3
-    if (hasClass(square6, "xSquare") &&
-        hasClass(square7, "xSquare") &&
-        hasClass(square8, "xSquare")) {
-        square6.className += " winningSquare";
-        square7.className += " winningSquare";
-        square8.className += " winningSquare";
-    } else if (hasClass(square6, "oSquare") &&
-               hasClass(square7, "oSquare") &&
-               hasClass(square8, "oSquare")) {
-        square6.className += " losingSquare";
-        square7.className += " losingSquare";
-        square8.className += " losingSquare";
-    }
-
-    // column 1
-    if (hasClass(square0, "xSquare") &&
-        hasClass(square3, "xSquare") &&
-        hasClass(square6, "xSquare")) {
-        square0.className += " winningSquare";
-        square3.className += " winningSquare";
-        square6.className += " winningSquare";
-    } else if (hasClass(square0, "oSquare") &&
-               hasClass(square3, "oSquare") &&
-               hasClass(square6, "oSquare")) {
-        square0.className += " losingSquare";
-        square3.className += " losingSquare";
-        square6.className += " losingSquare";
-    }
-
-    // column 2
-    if (hasClass(square1, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square7, "xSquare")) {
-        square1.className += " winningSquare";
-        square4.className += " winningSquare";
-        square7.className += " winningSquare";
-    } else if (hasClass(square1, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square7, "oSquare")) {
-        square1.className += " losingSquare";
-        square4.className += " losingSquare";
-        square7.className += " losingSquare";
-    }
-
-    // column 3
-    if (hasClass(square2, "xSquare") &&
-        hasClass(square5, "xSquare") &&
-        hasClass(square8, "xSquare")) {
-        square2.className += " winningSquare";
-        square5.className += " winningSquare";
-        square8.className += " winningSquare";
-    } else if (hasClass(square2, "oSquare") &&
-               hasClass(square5, "oSquare") &&
-               hasClass(square8, "oSquare")) {
-        square2.className += " losingSquare";
-        square5.className += " losingSquare";
-        square8.className += " losingSquare";
-    }
-
-    // diagonal left to right
-    if (hasClass(square0, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square8, "xSquare")) {
-        square0.className += " winningSquare";
-        square4.className += " winningSquare";
-        square8.className += " winningSquare";
-    } else if (hasClass(square0, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square8, "oSquare")) {
-        square0.className += " losingSquare";
-        square4.className += " losingSquare";
-        square8.className += " losingSquare";
-    }
-
-    // diagonal right to left
-    if (hasClass(square2, "xSquare") &&
-        hasClass(square4, "xSquare") &&
-        hasClass(square6, "xSquare")) {
-        square2.className += " winningSquare";
-        square4.className += " winningSquare";
-        square6.className += " winningSquare";
-    } else if (hasClass(square2, "oSquare") &&
-               hasClass(square4, "oSquare") &&
-               hasClass(square6, "oSquare")) {
-        square2.className += " losingSquare";
-        square4.className += " losingSquare";
-        square6.className += " losingSquare";
     }
 }
 
